@@ -1,44 +1,39 @@
 import { Injectable } from '@angular/core';
-import { Http, Response } from '@angular/http';
+import { HttpClient } from '@angular/common/http';
 
 import { RecipeService } from '../recipes/recipe.service';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
-import { Recipe } from '../recipes/recipe.model';
-import { Ingredient } from './ingredient.model';
 import { AuthService } from '../auth/auth.service';
+import { Recipe } from '../recipes/recipe.model';
 
 @Injectable({
   providedIn: 'root'
 })
 export class DataStorageService {
   constructor(
-    private http: Http,
+    private httpClient: HttpClient,
     private recipeService: RecipeService,
-    private authService: AuthService
   ) {}
 
-  storeRecipes$(): Observable<Response> {
-    const token = this.authService.getToken();
-    return this.http.put(
-      'https://ng-recipe-book-ae959.firebaseio.com/recipes.json?auth=' + token,
+  storeRecipes$() {
+    return this.httpClient.put(
+      'https://ng-recipe-book-ae959.firebaseio.com/recipes.json',
       this.recipeService.getRecipes()
     );
   }
 
   getRecipes() {
-    const token = this.authService.getToken();
-    this.http
-      .get('https://ng-recipe-book-ae959.firebaseio.com/recipes.json?auth=' + token)
+    this.httpClient
+      .get<Recipe[]>('https://ng-recipe-book-ae959.firebaseio.com/recipes.json')
       .pipe(
-        map((response: Response) => {
-          const fetchedRecipes = response.json();
-          for (const recipe of fetchedRecipes) {
+        map((recipes) => {
+          for (const recipe of recipes) {
             if (!recipe.ingredients) {
               recipe.ingredients = [];
             }
           }
-          return fetchedRecipes;
+          return recipes;
         })
       )
       .subscribe(recipes => {
