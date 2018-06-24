@@ -2,9 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 
 import { RecipeService } from '../recipes/recipe.service';
-import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
-import { AuthService } from '../auth/auth.service';
 import { Recipe } from '../recipes/recipe.model';
 
 @Injectable({
